@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <data>
   <service name="firenet">
-    <user>me@email.com</user>
-    <password>mypassword</password>
+    <user>me@maill.com</user>
+    <password>mypwd</password>
 
     <url_base>https://www.rika-firenet.com</url_base>
     <url_login>/web/login</url_login>
