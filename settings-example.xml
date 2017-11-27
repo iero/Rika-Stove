@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <data>
+
   <service name="firenet">
     <user>me@maill.com</user>
     <password>mypwd</password>
@@ -9,4 +10,12 @@
     <url_stove>/web/stove/</url_stove>
     <url_api>/api/client/</url_api>
   </service>
+
+  <service name="domoticz">
+  	<pellets>111</pellets>			<!-- Type : Counter incremental -->
+  	<burning>112</burning>			<!-- Type : lightning -->
+  	<target_temp>113</target_temp> 	<!-- Type : Thermostat -->
+  	<room_temp>110</room_temp> 		<!-- Type Temp -->
+  </service>
+
 </data>

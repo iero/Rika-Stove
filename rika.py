@@ -54,13 +54,15 @@ def show_stove_informations(data) :
 
 	print("+ Stove {0} [{1}]".format(data['name'],data['stoveID']))
 	print("+- Last seen {} min ago".format(data['lastSeenMinutes']))
-	print("+- Last Revision : {}".format(data['lastConfirmedRevision']))
+	lastConfirmedRevision = time.strftime('%d/%m/%Y %H:%M', time.localtime(data['lastConfirmedRevision']))
+	print("+- Last Revision : {}".format(lastConfirmedRevision))
 
 	# 'controls' available :
 	#'revision': 1511463447, 'onOff': True, 'operatingMode': 2, 'heatingPower': 70, 'targetTemperature': 18, 'heatingTimesActive': False, 'heatingTimesActiveForComfort': False, 'setBackTemperature': 13, 'convectionFan1Active': False, 'convectionFan1Level': 0, 'convectionFan1Area': 0, 'convectionFan2Active': False, 'convectionFan2Level': 0, 'convectionFan2Area': 0, 'frostProtectionActive': False, 'frostProtectionTemperature': 4
 
-	print("+- Control : ")
-	print("+-- Last Revision : {}".format(data['controls']['revision']))
+	print("\n+- Control : ")
+	revision = time.strftime('%d/%m/%Y %H:%M', time.localtime(data['controls']['revision']))
+	print("+-- Last Revision : {}".format(revision))
 
 	if data['controls']['onOff'] :
 		print("+-- Stove is online")
@@ -80,7 +82,7 @@ def show_stove_informations(data) :
 	# 'sensors' available :
 	#'statusError': 0, 'statusWarning': 0, 'statusService': 0, 'statusMainState': 4, 'statusSubState': 3, 'statusFrostStarted': False, 'inputFlameTemperature': 414, 'inputRoomTemperature': 17, 'inputExternalRequest': True, 'outputDischargeMotor': 391, 'outputInsertionMotor': 0, 'outputIDFan': 1368, 'outputAirFlaps': 0, 'outputIgnition': False, 'parameterStoveTypeNumber': 14, 'parameterVersionMainBoard': 223, 'parameterVersionTFT': 223, 'parameterRuntimePellets': 267, 'parameterRuntimeLogs': 0, 'parameterFeedRateTotal': 257, 'parameterFeedRateService': 443, 'parameterOnOffCycles': 9}, 'stoveType': 'CORSO', 'stoveFeatures': {'multiAir1': False, 'multiAir2': False, 'insertionMotor': False, 'airFlaps': False, 'logRuntime': False}}
 
-	print("+- Sensors : ")
+	print("\n+- Sensors : ")
 	if data['sensors']['statusMainState'] == 1 :
 		if data['sensors']['statusSubState'] == 0 :
 			print("+-- Stove off")
@@ -147,6 +149,12 @@ if __name__ == "__main__":
 			url_login = service.find('url_login').text
 			url_stove = service.find('url_stove').text
 			url_api = service.find('url_api').text
+
+		if service.get("name") == "domoticz" :
+			dmz_burning = service.find('pellets').text
+			dmz_pellets = service.find('pellets').text
+			dmz_target_temp = service.find('target_temp').text
+			dmz_room_temp = service.find('room_temp').text
 
 	client = requests.session()
 	stove = connect(client, url_base, url_login, url_stove, user, pwd)

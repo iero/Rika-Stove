@@ -17,3 +17,9 @@ Need a working firenet account.
 - Set temperature to X degrees
 
 - Todo : Will push informations to domoticz
+
+### Domoticz
+
+- Create dummy device 'Rika'
+- On this device, create sensors
+- Fill idx values in settings file
