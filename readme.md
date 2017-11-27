@@ -21,5 +21,9 @@ Need a working firenet account.
 ### Domoticz
 
 - Create dummy device 'Rika'
-- On this device, create sensors
+- On this device, create sensors :
+
+![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_sensors.png)
+
 - Fill idx values in settings file
+
