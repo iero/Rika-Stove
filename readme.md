@@ -5,6 +5,10 @@ G. Fabre - 2017
 python code to handle Rika stoves.
 Need a working firenet account.
 
+### Dependancies
+
+$ pip install beautifulsoup4
+
 ### Setup
 
 - Change user and password in settings-example.xml file

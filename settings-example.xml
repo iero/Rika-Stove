@@ -12,6 +12,7 @@
   </service>
 
   <service name="domoticz">
+    <server>127.0.0.1:8080</server>
   	<pellets>111</pellets>			<!-- Type : Counter incremental -->
   	<burning>112</burning>			<!-- Type : lightning -->
   	<target_temp>113</target_temp> 	<!-- Type : Thermostat -->

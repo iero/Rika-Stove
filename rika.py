@@ -2,6 +2,9 @@ import sys
 import time
 import requests
 
+# import json
+# import urllib2
+
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup # parse page
 
@@ -127,6 +130,15 @@ def is_stove_burning(data) :
 	else :
 		return False
 
+def updateSensor(domoticz,idx,value) :
+		if (value is None) : return
+		client = requests.session()
+		url="http://"+domoticz+"/json.htm?type=command&param=udevice&idx="+str(idx)+"&nvalue=0&svalue="+str(value)+";0"
+		# json.load(urllib2.urlopen(url))
+		r = client.get(url)
+		print(r.url)
+		return
+
 if __name__ == "__main__":
 
 	if len(sys.argv) < 2 :
@@ -151,6 +163,7 @@ if __name__ == "__main__":
 			url_api = service.find('url_api').text
 
 		if service.get("name") == "domoticz" :
+			dmz_server = service.find('server').text
 			dmz_burning = service.find('pellets').text
 			dmz_pellets = service.find('pellets').text
 			dmz_target_temp = service.find('target_temp').text
@@ -172,5 +185,11 @@ if __name__ == "__main__":
 				print("+-- Pellets consumption : {0} Kg".format(get_stove_consumption(stove_infos)))
 		else :
 			show_stove_informations(stove_infos)
-	elif sys.argv[1] == 'set' and len(sys.argv) > 2 :
+
+	if sys.argv[1] == 'update' :
+		stove_infos = get_stove_informations(client, url_base, url_api, stove)
+		updateSensor(dmz_server,dmz_pellets,get_stove_consumption(stove_infos))
+
+
+	if sys.argv[1] == 'set' and len(sys.argv) > 2 :
 		set_stove_temperature(client, url_base, url_api, stove, int(sys.argv[2]))
