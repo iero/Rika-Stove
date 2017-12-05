@@ -2,11 +2,10 @@ import sys
 import time
 import requests
 
-# import json
-# import urllib2
-
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup # parse page
+
+import urllib3
 
 def connect(client, url_base, url_login, url_stove, user, pwd) :
 	data = {
@@ -124,6 +123,13 @@ def show_stove_informations(data) :
 def get_stove_consumption(data) :
 	return data['sensors']['parameterFeedRateTotal']
 
+def get_stove_temperature(data) :
+	return data['sensors']['inputFlameTemperature']
+
+def get_stove_thermostat(data) :
+	return data['controls']['targetTemperature']
+
+
 def is_stove_burning(data) :
 	if data['sensors']['statusMainState'] == 4 or data['sensors']['statusMainState'] == 5 :
 		return True
@@ -131,25 +137,25 @@ def is_stove_burning(data) :
 		return False
 
 def updateSensor(domoticz,idx,value) :
+		urllib3.disable_warnings()
 		if (value is None) : return
 		client = requests.session()
 		url="http://"+domoticz+"/json.htm?type=command&param=udevice&idx="+str(idx)+"&nvalue=0&svalue="+str(value)+";0"
-		# json.load(urllib2.urlopen(url))
 		r = client.get(url)
-		print(r.url)
+		# print(r.url)
 		return
 
 if __name__ == "__main__":
 
 	if len(sys.argv) < 2 :
-		print(u"Please use # python rika.py cmd [val]")
+		print(u"Please use # python rika.py settings.xm cmd [val]")
 		print(u"Cmd can be :")
 		print(u"+ get [status|pellet]")
 		print(u"+ set temperature")
 		print(u"+ push -- to domoticz")
 		sys.exit(1)
 
-	auth_tree = ET.parse("settings.xml")
+	auth_tree = ET.parse(sys.argv[1])
 	auth_root = auth_tree.getroot()
 
 	for service in auth_root.findall('service') :
@@ -166,7 +172,7 @@ if __name__ == "__main__":
 			dmz_server = service.find('server').text
 			dmz_burning = service.find('pellets').text
 			dmz_pellets = service.find('pellets').text
-			dmz_target_temp = service.find('target_temp').text
+			dmz_thermostat = service.find('target_temp').text
 			dmz_room_temp = service.find('room_temp').text
 
 	client = requests.session()
@@ -176,20 +182,21 @@ if __name__ == "__main__":
 		print("No stove found (connection failed ?)")
 		sys.exit(1)
 
-	if sys.argv[1] == 'get' :
+	if sys.argv[2] == 'get' :
 		stove_infos = get_stove_informations(client, url_base, url_api, stove)
-		if len(sys.argv) >= 3 :
-			if sys.argv[2] == 'status' :
+		if len(sys.argv) >= 4 :
+			if sys.argv[3] == 'status' :
 				print("+-- Stove on : {0}".format(is_stove_burning(stove_infos)))
-			elif sys.argv[1] == 'pellets' :
+			elif sys.argv[3] == 'pellets' :
 				print("+-- Pellets consumption : {0} Kg".format(get_stove_consumption(stove_infos)))
 		else :
 			show_stove_informations(stove_infos)
 
-	if sys.argv[1] == 'update' :
+	if sys.argv[2] == 'update' :
 		stove_infos = get_stove_informations(client, url_base, url_api, stove)
 		updateSensor(dmz_server,dmz_pellets,get_stove_consumption(stove_infos))
+		updateSensor(dmz_server,dmz_burning,get_stove_temperature(stove_infos))
+		updateSensor(dmz_server,dmz_thermostat,get_stove_thermostat(stove_infos))
 
-
-	if sys.argv[1] == 'set' and len(sys.argv) > 2 :
-		set_stove_temperature(client, url_base, url_api, stove, int(sys.argv[2]))
+	if sys.argv[2] == 'set' and len(sys.argv) > 2 :
+		set_stove_temperature(client, url_base, url_api, stove, int(sys.argv[3]))
