@@ -5,8 +5,6 @@ import requests
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup # parse page
 
-import urllib3
-
 def connect(client, url_base, url_login, url_stove, user, pwd) :
 	data = {
 		'email':user,
@@ -129,6 +127,8 @@ def get_stove_temperature(data) :
 def get_stove_thermostat(data) :
 	return data['controls']['targetTemperature']
 
+def get_room_temperature(data) :
+	return data['controls']['targetTemperature']
 
 def is_stove_burning(data) :
 	if data['sensors']['statusMainState'] == 4 or data['sensors']['statusMainState'] == 5 :
@@ -137,7 +137,6 @@ def is_stove_burning(data) :
 		return False
 
 def updateSensor(domoticz,idx,value) :
-		urllib3.disable_warnings()
 		if (value is None) : return
 		client = requests.session()
 		url="http://"+domoticz+"/json.htm?type=command&param=udevice&idx="+str(idx)+"&nvalue=0&svalue="+str(value)+";0"
@@ -147,7 +146,7 @@ def updateSensor(domoticz,idx,value) :
 
 if __name__ == "__main__":
 
-	if len(sys.argv) < 2 :
+	if len(sys.argv) < 3 :
 		print(u"Please use # python rika.py settings.xm cmd [val]")
 		print(u"Cmd can be :")
 		print(u"+ get [status|pellet]")
@@ -170,8 +169,8 @@ if __name__ == "__main__":
 
 		if service.get("name") == "domoticz" :
 			dmz_server = service.find('server').text
-			dmz_burning = service.find('pellets').text
 			dmz_pellets = service.find('pellets').text
+			dmz_burning = service.find('burning_temp').text
 			dmz_thermostat = service.find('target_temp').text
 			dmz_room_temp = service.find('room_temp').text
 
@@ -197,6 +196,7 @@ if __name__ == "__main__":
 		updateSensor(dmz_server,dmz_pellets,get_stove_consumption(stove_infos))
 		updateSensor(dmz_server,dmz_burning,get_stove_temperature(stove_infos))
 		updateSensor(dmz_server,dmz_thermostat,get_stove_thermostat(stove_infos))
+		updateSensor(dmz_server,dmz_room_temp,get_room_temperature(stove_infos))
 
 	if sys.argv[2] == 'set' and len(sys.argv) > 2 :
 		set_stove_temperature(client, url_base, url_api, stove, int(sys.argv[3]))
