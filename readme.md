@@ -22,16 +22,16 @@ $ pip install beautifulsoup4
 - Update sensors values to domoticz
 - Control temperature from domoticz
 
-![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_th_pellets.png | width=250)
+<img src="https://github.com/iero/Rika-Stove/raw/master/misc/dmz_th_pellets.png" width="250">
 
-![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_pellets.png)
+![](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_pellets.png)
 
 ### Domoticz
 
 - Create dummy device 'Rika'
 - On this device, create sensors :
 
-![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_sensors.png)
+![](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_sensors.png)
 
 - Fill idx values in settings file
 - Update and place lua file in domoticz/scripts/lua directory
