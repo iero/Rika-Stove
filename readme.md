@@ -22,7 +22,7 @@ $ pip install beautifulsoup4
 - Update sensors values to domoticz
 - Control temperature from domoticz
 
-<img src="https://github.com/iero/Rika-Stove/raw/master/misc/dmz_th_pellets.png" width="250">
+<img src="https://github.com/iero/Rika-Stove/raw/master/misc/dmz_th_pellets.png" width="500">
 
 ![](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_pellets.png)
 
