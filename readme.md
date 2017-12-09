@@ -34,4 +34,5 @@ $ pip install beautifulsoup4
 ![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_sensors.png)
 
 - Fill idx values in settings file
+- Update and place lua file in domoticz/scripts/lua directory
 
