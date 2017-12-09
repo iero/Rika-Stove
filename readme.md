@@ -19,8 +19,12 @@ $ pip install beautifulsoup4
 
 - Get data from your stove (1 stove yet, but can be extended)
 - Set temperature to X degrees
+- Update sensors values to domoticz
+- Control temperature from domoticz
 
-- Todo : Will push informations to domoticz
+![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_th_pellets.png)
+
+![alt text](https://github.com/iero/Rika-Stove/raw/master/misc/dmz_pellets.png)
 
 ### Domoticz
 
