@@ -41,10 +41,18 @@ def set_stove_temperature(client, url_base, url_api, stove, temperature) :
 		data['targetTemperature'] = str(temperature)
 
 		r = client.post(url_base+url_api+stove+'/controls', data)
-		# print(r.url)
-		if ('OK' in r.text) == True :
-			print('Temperature target is now {} degC'.format(temperature))
-			return True
+
+		for counter in range (0,10) :
+			if ('OK' in r.text) == True :
+				print('Temperature target is now {} degC'.format(temperature))
+				return True
+			else :
+				print('In progress.. ({}/10)'.format(counter))
+				time.sleep(2)
+	elif temperature < min :
+		print("Too cold ! {} degC minimum !".format(min))
+	else :
+		print("Too hot ! {} degC maximum !".format(max))
 
 def get_stove_informations(client, url_base, url_api, stove) :
 	r = client.get(url_base+url_api+stove+'/status?nocache=')
@@ -136,13 +144,35 @@ def is_stove_burning(data) :
 	else :
 		return False
 
-def updateSensor(domoticz,idx,value) :
-		if (value is None) : return
-		client = requests.session()
-		url="http://"+domoticz+"/json.htm?type=command&param=udevice&idx="+str(idx)+"&nvalue=0&svalue="+str(value)+";0"
+# Update domoticz thermostat set point if updated from fire-net or by and
+def updateThermostat(domoticz,idx,value) :
+	if (value is None) : return
+
+	client = requests.session()
+	url="http://"+domoticz+"/json.htm?type=devices&rid="+str(idx)
+	r = client.get(url)
+	data = r.json()
+
+	# print(data)
+	thermostat_setPoint = float(data['result'][0]['SetPoint'])
+	if thermostat_setPoint != float(value) :
+		print("Thermostat update from {} to {}".format(thermostat_setPoint,value))
+		url="http://"+domoticz+"/json.htm?type=command&param=udevice&idx="+str(idx)+"&nvalue=0&svalue="+str(value)
 		r = client.get(url)
-		# print(r.url)
-		return
+		if 'OK' in r.text :
+			return True
+		else :
+			return False
+	return True
+
+def updateSensor(domoticz,idx,value) :
+	if (value is None) : return
+
+	client = requests.session()
+	url="http://"+domoticz+"/json.htm?type=command&param=udevice&idx="+str(idx)+"&nvalue=0&svalue="+str(value)+";0"
+	r = client.get(url)
+	# print(r.url)
+	return
 
 if __name__ == "__main__":
 
@@ -193,10 +223,18 @@ if __name__ == "__main__":
 
 	if sys.argv[2] == 'update' :
 		stove_infos = get_stove_informations(client, url_base, url_api, stove)
+
+		# Update sensors
 		updateSensor(dmz_server,dmz_pellets,get_stove_consumption(stove_infos))
 		updateSensor(dmz_server,dmz_burning,get_stove_temperature(stove_infos))
-		updateSensor(dmz_server,dmz_thermostat,get_stove_thermostat(stove_infos))
 		updateSensor(dmz_server,dmz_room_temp,get_room_temperature(stove_infos))
 
+		# Update sensor value if updated in firenet or by hand on stove
+		updateThermostat(dmz_server,dmz_thermostat,get_stove_thermostat(stove_infos))
+
+
 	if sys.argv[2] == 'set' and len(sys.argv) > 2 :
-		set_stove_temperature(client, url_base, url_api, stove, int(sys.argv[3]))
+		targetTemp = float(sys.argv[3])
+		stove_infos = get_stove_informations(client, url_base, url_api, stove)
+		if float(get_stove_thermostat(stove_infos)) != targetTemp :
+			set_stove_temperature(client, url_base, url_api, stove, int(targetTemp))
